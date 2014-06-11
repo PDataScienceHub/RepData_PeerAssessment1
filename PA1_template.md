@@ -5,7 +5,8 @@ Report for Reproducible Research: Peer Assessment 1
 ## Loading data
 
 Unzip the data file and load the data
-```{r LoadData, echo=TRUE}
+
+```r
 aData <- read.csv(unz("activity.zip", "activity.csv"),
                   header=TRUE, comment.char="")
 ```
@@ -14,7 +15,8 @@ aData <- read.csv(unz("activity.zip", "activity.csv"),
 ## What is the mean and median total number of steps taken per day?
 
 Histogram of the total number of steps taken each day
-```{r TotalDailySteps, echo=TRUE}
+
+```r
 # First, calculate total number of steps taken each day
 library(plyr)
 dailySteps <- ddply(aData, .(date), 
@@ -26,7 +28,11 @@ names(dailySteps) <- c("date", "steps")
 hist(dailySteps$steps, col="cyan", 
      xlab = "Daily Total Steps", 
      main = "Histogram of Total Number of Steps Taken Each Day")
+```
 
+![plot of chunk TotalDailySteps](figure/TotalDailySteps.png) 
+
+```r
 # Compute the mean and the median
 meansteps <- round(mean(dailySteps$steps), 2)
 mediansteps <- median(dailySteps$steps)
@@ -35,11 +41,12 @@ mediansteps <- median(dailySteps$steps)
 rm(dailySteps)
 ```
 
-**Mean total number of steps taken per day is `r meansteps` and the median is `r mediansteps`.**
+**Mean total number of steps taken per day is 9354.23 and the median is 10395.**
 
 
 ## What is the average daily activity pattern?
-```{r AvgPerInterval, echo=TRUE}
+
+```r
 # First, calculate average number of steps per interval
 avgSteps <- ddply(aData, .(interval), 
              function(x) mean(x$steps, na.rm=TRUE))
@@ -49,17 +56,20 @@ names(avgSteps) <- c("interval", "steps")
 library(lattice)
 xyplot(steps ~ interval, data=avgSteps, type="l", 
        xlab = "Interval", ylab = "Average Steps")
-
-# Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-maxinterval <- avgSteps[which.max(avgSteps$steps),]$interval
-
 ```
 
-**Interval # `r maxinterval` contains the maximum number of steps on average across all the days.**
+![plot of chunk AvgPerInterval](figure/AvgPerInterval.png) 
+
+```r
+# Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+maxinterval <- avgSteps[which.max(avgSteps$steps),]$interval
+```
+
+**Interval # 835 contains the maximum number of steps on average across all the days.**
 
 ## Imputing missing values
-```{r ImputMissingValues, echo=TRUE}
 
+```r
 # Calculate the total number of missing values in the dataset
 missing <- sum(!complete.cases(aData))
 
@@ -84,22 +94,26 @@ names(dSteps) <- c("date", "steps")
 hist(dSteps$steps, col="cyan", 
      xlab = "Daily Total Steps", 
      main = "Histogram of Total Number of Steps Taken Daily")
+```
 
+![plot of chunk ImputMissingValues](figure/ImputMissingValues.png) 
+
+```r
 # Compute the mean and the median
 # Show all 7 digits
 options(scipen = 1, digits = 7)
 meansteps <- round(mean(dSteps$steps), 2)
 mediansteps <- round(median(dSteps$steps), 2)
-
 ```
 
-**Total number of missing values in the dataset is `r missing`.**
-**After imputing missing values, mean total number of steps taken per day is `r meansteps` and the median is `r mediansteps`.** These values differ from the mean and median values when the missing values were not filled in. After imputing the missing values with the mean of that interval, the mean and median are the same.
+**Total number of missing values in the dataset is 2304.**
+**After imputing missing values, mean total number of steps taken per day is 10766.19 and the median is 10766.19.** These values differ from the mean and median values when the missing values were not filled in. After imputing the missing values with the mean of that interval, the mean and median are the same.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r DayPattern, echo=TRUE}
+
+```r
 # Add a new factor variable in the dataset with two 
 # levels - "weekday" and "weekend" indicating whether
 # a given date is a weekday or weekend day.
@@ -124,5 +138,6 @@ names(tData) <- c("interval", "day", "steps")
 xyplot(steps ~ interval | day, data=tData, type="l", 
        layout=c(1,2), xlab = "Interval", 
        ylab = "Number of Steps")
-
 ```
+
+![plot of chunk DayPattern](figure/DayPattern.png) 
